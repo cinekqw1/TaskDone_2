@@ -1,14 +1,11 @@
 package com.example.marcin.teskdone_2;
 
-import android.app.ActionBar;
-import android.app.ProgressDialog;
+
 import android.content.Context;
 import android.content.Intent;
-
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
@@ -34,7 +31,6 @@ public class Login extends AppCompatActivity implements View.OnClickListener
     Button B_signin;
     EditText ET_Email;
     EditText ET_password;
-    ProgressDialog pd;
     JSONObject Json_object;
     JSONObject Json_response;
     String URL = "https://shopping-rails-app.herokuapp.com/api";
@@ -237,22 +233,19 @@ public class Login extends AppCompatActivity implements View.OnClickListener
 
     private void responce_manage(JSONObject Json) throws JSONException {
         String x = Json.getString("status");
-
+        View view = getWindow().getDecorView().getRootView();
 
         if(x.equals("no connection to server"))
         {
-            Toast.makeText(this,"No connection to server",Toast.LENGTH_SHORT).show();
-
+            Snackbar.make(view, "No connection to server", Snackbar.LENGTH_LONG).show();
         }
         if(x.equals("email error"))
         {
-            Toast.makeText(this,"Invalid email",Toast.LENGTH_SHORT).show();
-
+            Snackbar.make(view, "Invalid email", Snackbar.LENGTH_LONG).show();
         }
         if(x.equals("password error"))
         {
-            Toast.makeText(this,"Invalid password",Toast.LENGTH_SHORT).show();
-
+            Snackbar.make(view, "Invalid password", Snackbar.LENGTH_LONG).show();
         }
         if(x.equals("succesfull log in"))
         {

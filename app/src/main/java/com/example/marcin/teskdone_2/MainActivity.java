@@ -2,13 +2,15 @@ package com.example.marcin.teskdone_2;
 
 import android.content.Intent;
 import android.os.AsyncTask;
+import android.support.design.widget.FloatingActionButton;
+
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.TextView;
+
 import android.widget.Toast;
 
 import org.json.JSONArray;
@@ -19,7 +21,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
+
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
@@ -41,10 +43,13 @@ public class MainActivity extends AppCompatActivity implements TasksListFragment
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+
+
         Intent intent = getIntent();
         Token = intent.getStringExtra("token");
 
         new MainActivity.CallServiceTask().execute(URL,Token);
+
 
 
 
@@ -230,6 +235,13 @@ public class MainActivity extends AppCompatActivity implements TasksListFragment
         }
 
         setContentView(R.layout.activity_main);
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+            }
+        });
     }
 
 
