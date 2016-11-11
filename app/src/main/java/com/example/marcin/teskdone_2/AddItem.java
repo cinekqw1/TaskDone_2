@@ -31,7 +31,8 @@ public class AddItem extends AppCompatActivity implements View.OnClickListener {
     private void pullBack(){
 
         Intent iData = new Intent();
-        iData.putExtra("key","value");
+        iData.putExtra("title",ET_title.getText().toString());
+        iData.putExtra("description",ET_description.getText().toString());
 
         setResult(Activity.RESULT_OK,iData);
         finish();

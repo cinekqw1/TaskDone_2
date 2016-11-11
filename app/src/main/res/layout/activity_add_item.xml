@@ -11,7 +11,8 @@
         android:layout_height="match_parent"
         android:orientation="vertical"
         tools:context="com.example.marcin.teskdone_2.AddItem"
-        android:weightSum="1">
+        android:weightSum="1"
+        android:layout_margin="10dp">
 
 
     <TextView
@@ -26,8 +27,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:inputType="textPersonName" android:ems="10"
-        android:id="@+id/editText_title"
-        android:hint="title here" />
+        android:id="@+id/editText_title" />
 
     <TextView
         android:text="Descrption:"
@@ -39,25 +39,28 @@
 
     <EditText
         android:layout_width="match_parent"
-        android:inputType="textPersonName" android:ems="10"
+        android:inputType="textMultiLine" android:ems="10"
         android:id="@+id/editText_description"
-        android:layout_height="wrap_content"
-        android:text="description here" />
+        android:layout_height="wrap_content" />
+
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="66dp">
 
         <Button
             android:text="OK"
             android:layout_width="100dp"
             android:layout_height="wrap_content"
             android:id="@+id/button_ok"
-            android:layout_marginEnd="28dp"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentEnd="true" />
+            android:layout_marginEnd="26dp"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginBottom="20dp" />
+
+
     </RelativeLayout>
 
-</LinearLayout>
+    </LinearLayout>
 
 </ScrollView>

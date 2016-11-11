@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
+import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
@@ -31,14 +32,14 @@ import java.util.Map;
 
 public class MainActivity extends AppCompatActivity implements TasksListFragment.TasksListListener{
 
-
+    private JSONObject Json_object;
     private static final int MY_REQUEST_CODE = 123;
     private String Token;
     private String URL = "https://shopping-rails-app.herokuapp.com/api/items";
     private String URL_logout = "https://shopping-rails-app.herokuapp.com/api/logout";
+    private String URL_create_item = "https://shopping-rails-app.herokuapp.com/api/createitem";
 
-
-    public static ArrayList<Tasks> taskLista = new ArrayList<Tasks>();
+    public static ArrayList<Tasks> taskLista = new ArrayList<>();
 
 
     @Override
@@ -48,7 +49,7 @@ public class MainActivity extends AppCompatActivity implements TasksListFragment
         Intent intent = getIntent();
         Token = intent.getStringExtra("token");
 
-        new MainActivity.CallServiceTask().execute(URL,Token);
+        new MainActivity.CallServiceTask().execute("items",URL,Token);
 
     }
 
@@ -65,7 +66,7 @@ public class MainActivity extends AppCompatActivity implements TasksListFragment
         switch (item.getItemId()) {
             case R.id.log_out:
             {
-                new MainActivity.CallServiceTask().execute(URL_logout,Token);
+                new MainActivity.CallServiceTask().execute("logout",URL_logout,Token);
 
             }
                 return true;
@@ -95,6 +96,8 @@ public class MainActivity extends AppCompatActivity implements TasksListFragment
 
     public class CallServiceTask extends AsyncTask<String, Void, String> {
 
+
+
         @Override
         protected void onPreExecute() {
 
@@ -104,8 +107,15 @@ public class MainActivity extends AppCompatActivity implements TasksListFragment
         protected String doInBackground(String... urls)
         {
             try {
-                return push_json(urls[0],urls[1]);
-
+                if(urls[0].equals("items")) {
+                    return push_json_items(urls[1], urls[2]);
+                }
+                if(urls[0].equals("create_item")){
+                    return push_json_create_item(urls[1], urls[2],urls[3],urls[4]);
+                }
+                if(urls[0].equals("logout")){
+                    return push_json_items(urls[1], urls[2]);
+                }
             } catch (IOException e) {
                 return "{\"status\":\"no connection to server\"}";
             } catch (JSONException e) {
@@ -115,7 +125,8 @@ public class MainActivity extends AppCompatActivity implements TasksListFragment
 
         }
 
-        private String push_json(String myurl,String token) throws IOException, JSONException {
+        private String push_json_items(String myurl,String token) throws IOException, JSONException {
+
 
             InputStream is = null;
 
@@ -175,12 +186,63 @@ public class MainActivity extends AppCompatActivity implements TasksListFragment
 
         }
 
-        // onPostExecute displays the results of the AsyncTask.
+        private String  push_json_create_item(String myurl,String token,String title, String description) throws IOException, JSONException {
+
+
+            Json_object = Json_build(title,description);
+
+
+            InputStream is = null;
+
+
+            try {
+                java.net.URL url = new URL(myurl);
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.setReadTimeout(10000 /* milliseconds */);
+                conn.setConnectTimeout(15000 /* milliseconds */);
+                conn.setRequestProperty("Content-Type", "application/json");
+                conn.setRequestProperty("Accept", "application/json");
+                conn.addRequestProperty ("Authorization" , "Token token="+token );
+                conn.setRequestMethod("POST");
+                conn.connect();
+
+
+
+
+                //wysyłanie:
+                OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream());
+                wr.write(String.valueOf(Json_object));
+                wr.flush();
+
+
+
+
+
+                StringBuilder sb = new StringBuilder();
+                int HttpResult = conn.getResponseCode();
+                if (HttpResult == HttpURLConnection.HTTP_OK) {
+                    BufferedReader br = new BufferedReader(
+                            new InputStreamReader(conn.getInputStream(), "utf-8"));
+                    String line = null;
+                    while ((line = br.readLine()) != null) {
+                        sb.append(line + "\n");
+                    }
+                    br.close();
+                    return sb.toString();
+                } else {
+                    return conn.getResponseMessage().toString();
+                }
+
+            } finally {
+                if (is != null) {
+                    is.close();
+                }
+            }
+
+
+        }
         @Override
         protected void onPostExecute(String result) {
-
-
-            if(result!=null) {
 
 
                 try {
@@ -205,22 +267,39 @@ public class MainActivity extends AppCompatActivity implements TasksListFragment
                 }
 
 
+        }
 
-            }
+        private JSONObject Json_build(String title, String description) throws JSONException {
 
+            JSONObject jo = new JSONObject();
+            JSONObject jo_final = new JSONObject();
+            jo.put("title", title);
+            jo.put("description", description);
+
+            jo_final.put("item", jo);
+
+            return jo_final;
         }
 
     }
 
-    private void logout() {
-        Toast.makeText(this,"seccesfull logout",Toast.LENGTH_SHORT).show();
-        finish();
-    }
+
 
     private void responce_menage(JSONObject jj) throws JSONException {
         if(jj.getString("status").equals("succesfull log out")){
-            logout();
+            Toast.makeText(this,"successful logout",Toast.LENGTH_SHORT).show();
+            finish();
         }
+        if(jj.getString("status").equals("item created")){
+            Toast.makeText(this,"item created",Toast.LENGTH_SHORT).show();
+        }
+        if(jj.getString("status").equals("item created error")){
+            Toast.makeText(this,"item created error",Toast.LENGTH_SHORT).show();
+        }
+        if(jj.getString("status").equals("no connection to server")){
+            Toast.makeText(this,"no connection to server",Toast.LENGTH_SHORT).show();
+        }
+
 
     }
     private void responce_manage(JSONArray jsonArray) throws JSONException {
@@ -249,7 +328,10 @@ public class MainActivity extends AppCompatActivity implements TasksListFragment
     protected void onActivityResult(int requestCode, int resultCode, Intent pData){
         if(requestCode == MY_REQUEST_CODE){
             if (resultCode == Activity.RESULT_OK){
-                final String zData = pData.getStringExtra("key");
+                final String title_respond = pData.getStringExtra("title");
+                final String description_respond = pData.getStringExtra("description");
+
+                new MainActivity.CallServiceTask().execute("create_item",URL_create_item,Token,title_respond,description_respond);
             }
         }
 
