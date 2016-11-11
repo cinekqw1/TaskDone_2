@@ -6,15 +6,17 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 
 /**
  * A simple {@link Fragment} subclass.
  */
-public class TasksDetailFragment extends Fragment {
+public class TasksDetailFragment extends Fragment implements View.OnClickListener {
 
-
+    ImageButton IB_coplete;
+    ImageButton IB_delete;
     private long workoutId;
 
     public TasksDetailFragment() {
@@ -29,8 +31,16 @@ public class TasksDetailFragment extends Fragment {
         if(savedInstanceState!=null){
             workoutId = savedInstanceState.getLong("workoutId");
         }
-        // Inflate the layout for this fragment
+
+        initialize();
         return inflater.inflate(R.layout.fragment_tasks_detail, container, false);
+    }
+
+    private void initialize() {
+        IB_coplete = (ImageButton) getView().findViewById(R.id.imageButton_complete);
+        IB_delete = (ImageButton) getView().findViewById(R.id.imageButton_delete);
+        IB_delete.setOnClickListener(this);
+        IB_coplete.setOnClickListener(this);
     }
 
     public void setWorkoutId(long id){
@@ -53,4 +63,18 @@ public class TasksDetailFragment extends Fragment {
         savedInstanceState.putLong("workoutId", workoutId);
     }
 
+    @Override
+    public void onClick(View v) {
+        switch(v.getId()){
+
+            case R.id.imageButton_complete:{
+
+
+            }
+            case R.id.imageButton_delete:{
+
+
+            }
+        }
+    }
 }
