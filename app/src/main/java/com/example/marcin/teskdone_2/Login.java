@@ -28,12 +28,12 @@ public class Login extends AppCompatActivity implements View.OnClickListener
 {
 
 
-    Button B_signin;
-    EditText ET_Email;
-    EditText ET_password;
-    JSONObject Json_object;
-    JSONObject Json_response;
-    String URL = "https://shopping-rails-app.herokuapp.com/api";
+    private Button B_signin;
+    private EditText ET_Email;
+    private EditText ET_password;
+    private JSONObject Json_object;
+    private  JSONObject Json_response;
+    private String URL = "https://shopping-rails-app.herokuapp.com/api";
 
 
 

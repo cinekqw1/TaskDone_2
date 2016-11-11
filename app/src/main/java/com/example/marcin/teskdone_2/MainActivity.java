@@ -1,5 +1,6 @@
 package com.example.marcin.teskdone_2;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.support.design.widget.FloatingActionButton;
@@ -12,7 +13,7 @@ import android.view.MenuItem;
 import android.view.View;
 
 import android.widget.Toast;
-
+import android.content.Intent;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -31,6 +32,7 @@ import java.util.Map;
 public class MainActivity extends AppCompatActivity implements TasksListFragment.TasksListListener{
 
 
+    private static final int MY_REQUEST_CODE = 123;
     private String Token;
     private String URL = "https://shopping-rails-app.herokuapp.com/api/items";
     private String URL_logout = "https://shopping-rails-app.herokuapp.com/api/logout";
@@ -43,15 +45,10 @@ public class MainActivity extends AppCompatActivity implements TasksListFragment
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-
-
         Intent intent = getIntent();
         Token = intent.getStringExtra("token");
 
         new MainActivity.CallServiceTask().execute(URL,Token);
-
-
-
 
     }
 
@@ -239,10 +236,25 @@ public class MainActivity extends AppCompatActivity implements TasksListFragment
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+               startAddItem();
             }
         });
     }
+
+    private void startAddItem() {
+        Intent intent = new Intent(this, AddItem.class);
+        startActivityForResult(intent,MY_REQUEST_CODE);
+    }
+
+    protected void onActivityResult(int requestCode, int resultCode, Intent pData){
+        if(requestCode == MY_REQUEST_CODE){
+            if (resultCode == Activity.RESULT_OK){
+                final String zData = pData.getStringExtra("key");
+            }
+        }
+
+    }
+
 
 
 
