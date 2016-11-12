@@ -6,14 +6,22 @@ package com.example.marcin.teskdone_2;
 
 public class Tasks {
 
+    private int id;
     private String name;
     private String description;
+    private String completed_at;
 
 
-    Tasks(String name, String description) {
+    Tasks(int id, String name, String description, String completed_at) {
+        this.id = id;
         this.name = name;
         this.description = description;
+        this.completed_at = completed_at;
 
+    }
+
+    public int getId() {
+        return id;
     }
 
     public String getDescription() {
@@ -22,6 +30,10 @@ public class Tasks {
 
     public String getName() {
         return name;
+    }
+
+    public String getCompleted_at() {
+        return completed_at;
     }
 
     public  String toString(){

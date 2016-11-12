@@ -30,7 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class MainActivity extends AppCompatActivity implements TasksListFragment.TasksListListener{
+public class MainActivity extends AppCompatActivity implements TasksListFragment.TasksListListener, TasksDetailFragment.ButtonListener{
 
     private JSONObject Json_object;
     private static final int MY_REQUEST_CODE = 123;
@@ -93,6 +93,12 @@ public class MainActivity extends AppCompatActivity implements TasksListFragment
             startActivity(intent);
         }
     }
+
+    @Override
+    public void buttonClicked(long id, String button) {
+        Toast.makeText(this, "click",Toast.LENGTH_SHORT).show();
+    }
+
 
     public class CallServiceTask extends AsyncTask<String, Void, String> {
 
@@ -307,8 +313,14 @@ public class MainActivity extends AppCompatActivity implements TasksListFragment
         taskLista.clear();
 
         for (int i = 0; i < jsonArray.length(); i++) {
-            taskLista.add(new Tasks(jsonArray.getJSONObject(i).getString("title"), jsonArray.getJSONObject(i).getString("description")));
+
+            if(!jsonArray.getJSONObject(i).isNull("completed_at")) {
+                taskLista.add(new Tasks(jsonArray.getJSONObject(i).getInt("id"), jsonArray.getJSONObject(i).getString("title"), jsonArray.getJSONObject(i).getString("description"), jsonArray.getJSONObject(i).getString("completed_at")));
+            }else{
+                taskLista.add(new Tasks(jsonArray.getJSONObject(i).getInt("id"), jsonArray.getJSONObject(i).getString("title"), jsonArray.getJSONObject(i).getString("description"),  "x"));
+            }
         }
+        for(int i =0; i<taskLista.size();i++) System.out.println(taskLista.get(i).getName()+ " "+ taskLista.get(i).getId() + " "+  taskLista.get(i).getCompleted_at()+ " ");
 
         setContentView(R.layout.activity_main);
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
