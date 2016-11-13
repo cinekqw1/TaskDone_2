@@ -96,7 +96,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener
                 {
                     Toast.makeText(this,"empty field",Toast.LENGTH_SHORT).show();
                 }
-            }
+            }break;
 
 
         }

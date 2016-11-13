@@ -29,7 +29,8 @@ public class TasksDetailFragment extends Fragment implements View.OnClickListene
 
 
     static interface ButtonListener {
-        void buttonClicked(long id, String button);
+        void buttonDeleteClicked(int id );
+        void buttonCompleteClicked(int id);
     };
 
     private ButtonListener listener;
@@ -95,11 +96,14 @@ public class TasksDetailFragment extends Fragment implements View.OnClickListene
         switch (v.getId()){
 
             case R.id.imageButton_complete:{
-                if(listener!=null) listener.buttonClicked(workoutId,"complete");
-            }
+                Tasks item = MainActivity.taskLista.get((int) workoutId);
+                if(listener!=null) listener.buttonCompleteClicked(item.getId());
+            }break;
             case R.id.imageButton_delete:{
-                if(listener!=null) listener.buttonClicked(workoutId,"delete");
-            }
+                Tasks item = MainActivity.taskLista.get((int) workoutId);
+                if(listener!=null) listener.buttonDeleteClicked(item.getId());
+            }break;
+
         }
     }
 

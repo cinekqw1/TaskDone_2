@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.support.design.widget.FloatingActionButton;
 
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -30,14 +31,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class MainActivity extends AppCompatActivity implements TasksListFragment.TasksListListener, TasksDetailFragment.ButtonListener{
+public class MainActivity extends AppCompatActivity implements TasksListFragment.TasksListListener, TasksDetailFragment.ButtonListener, CallbackBackgroundService{
 
     private JSONObject Json_object;
     private static final int MY_REQUEST_CODE = 123;
-    private String Token;
+    private static String Token;
     private String URL = "https://shopping-rails-app.herokuapp.com/api/items";
     private String URL_logout = "https://shopping-rails-app.herokuapp.com/api/logout";
     private String URL_create_item = "https://shopping-rails-app.herokuapp.com/api/createitem";
+    private String URL_delete = "https://shopping-rails-app.herokuapp.com/api/destroy";
 
     public static ArrayList<Tasks> taskLista = new ArrayList<>();
 
@@ -49,8 +51,13 @@ public class MainActivity extends AppCompatActivity implements TasksListFragment
         Intent intent = getIntent();
         Token = intent.getStringExtra("token");
 
+
         new MainActivity.CallServiceTask().execute("items",URL,Token);
 
+    }
+
+    public static String getToken(){
+        return Token;
     }
 
     @Override
@@ -94,9 +101,22 @@ public class MainActivity extends AppCompatActivity implements TasksListFragment
         }
     }
 
+
+
     @Override
-    public void buttonClicked(long id, String button) {
-        Toast.makeText(this, "click",Toast.LENGTH_SHORT).show();
+    public void buttonDeleteClicked(int id) {
+        new BackgroundService((CallbackBackgroundService) this).execute("delete",URL_delete,Token,String.valueOf(id));
+    }
+
+    @Override
+    public void buttonCompleteClicked(int id) {
+
+    }
+
+    @Override
+    public void callbackBackgroundService(String result) {
+        View view = getWindow().getDecorView().getRootView();
+        Snackbar.make(view, "item deleted error", Snackbar.LENGTH_LONG).show();
     }
 
 
@@ -122,6 +142,7 @@ public class MainActivity extends AppCompatActivity implements TasksListFragment
                 if(urls[0].equals("logout")){
                     return push_json_items(urls[1], urls[2]);
                 }
+
             } catch (IOException e) {
                 return "{\"status\":\"no connection to server\"}";
             } catch (JSONException e) {
@@ -247,9 +268,12 @@ public class MainActivity extends AppCompatActivity implements TasksListFragment
 
 
         }
+
+
+
+
         @Override
         protected void onPostExecute(String result) {
-
 
                 try {
                     JSONArray jsonArray = new JSONArray(result);
@@ -271,8 +295,6 @@ public class MainActivity extends AppCompatActivity implements TasksListFragment
                         e1.printStackTrace();
                     }
                 }
-
-
         }
 
         private JSONObject Json_build(String title, String description) throws JSONException {
@@ -292,18 +314,29 @@ public class MainActivity extends AppCompatActivity implements TasksListFragment
 
 
     private void responce_menage(JSONObject jj) throws JSONException {
+
         if(jj.getString("status").equals("succesfull log out")){
             Toast.makeText(this,"successful logout",Toast.LENGTH_SHORT).show();
             finish();
         }
         if(jj.getString("status").equals("item created")){
             Toast.makeText(this,"item created",Toast.LENGTH_SHORT).show();
+            finish();
+            startActivity(getIntent());
         }
         if(jj.getString("status").equals("item created error")){
             Toast.makeText(this,"item created error",Toast.LENGTH_SHORT).show();
         }
         if(jj.getString("status").equals("no connection to server")){
             Toast.makeText(this,"no connection to server",Toast.LENGTH_SHORT).show();
+        }
+        if (jj.getString("status").equals("item deleted")){
+            Toast.makeText(this,"item deleted",Toast.LENGTH_SHORT).show();
+            finish();
+            startActivity(getIntent());
+        }
+        if (jj.getString("status").equals("item deleted error")){
+            Toast.makeText(this,"item deleted error",Toast.LENGTH_SHORT).show();
         }
 
 

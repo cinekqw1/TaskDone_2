@@ -1,12 +1,16 @@
 package com.example.marcin.teskdone_2;
 
+import android.content.Intent;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Toast;
 
-public class DetailActivity extends AppCompatActivity implements TasksDetailFragment.ButtonListener {
+public class DetailActivity extends AppCompatActivity implements TasksDetailFragment.ButtonListener, CallbackBackgroundService {
 
     public static final String EXTRA_WORKOUT_ID = "id";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -18,8 +22,30 @@ public class DetailActivity extends AppCompatActivity implements TasksDetailFrag
         workoutDetailFragment.setWorkoutId(workoutId);
     }
 
+
+
     @Override
-    public void buttonClicked(long id, String button) {
-        Toast.makeText(this,button+" "+id,Toast.LENGTH_SHORT).show();
+    public void buttonDeleteClicked(int id) {
+
+
+         new BackgroundService(this).execute("delete","https://shopping-rails-app.herokuapp.com/api/destroy",MainActivity.getToken(),String.valueOf(id));
+    }
+
+    @Override
+    public void buttonCompleteClicked(int id) {
+        //Toast.makeText(this,"comp",Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void callbackBackgroundService(String result) {
+
+        if(result.equals("item deleted")){
+            
+            finish();
+        }
+        if(result.equals("item deleted error")){
+            View view = getWindow().getDecorView().getRootView();
+            Snackbar.make(view, "item deleted error", Snackbar.LENGTH_LONG).show();
+        }
     }
 }
