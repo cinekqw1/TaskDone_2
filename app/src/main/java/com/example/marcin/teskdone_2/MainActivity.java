@@ -1,30 +1,31 @@
 package com.example.marcin.teskdone_2;
 
 import android.app.Activity;
+import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.os.AsyncTask;
+import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.*;
+import android.support.v4.app.ListFragment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-
 import android.widget.Toast;
-import android.content.Intent;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-
 import java.io.OutputStreamWriter;
+import java.lang.reflect.Field;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
@@ -41,7 +42,7 @@ public class MainActivity extends AppCompatActivity implements TasksListFragment
     private String URL_create_item = "https://shopping-rails-app.herokuapp.com/api/createitem";
     private String URL_delete = "https://shopping-rails-app.herokuapp.com/api/destroy";
 
-    public static ArrayList<Tasks> taskLista = new ArrayList<>();
+    public static ArrayList<Tasks> taskLista = new ArrayList<>(0);
 
 
     @Override
@@ -52,12 +53,38 @@ public class MainActivity extends AppCompatActivity implements TasksListFragment
         Token = intent.getStringExtra("token");
 
 
-        new MainActivity.CallServiceTask().execute("items",URL,Token);
+
+
+        setContentView(R.layout.activity_main);
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startAddItem();
+            }
+        });
+
+        final Handler handler = new Handler();
+        handler.postDelayed( new Runnable() {
+
+            @Override
+            public void run() {
+
+                    new MainActivity.CallServiceTask().execute("items",URL,Token);
+
+
+                handler.postDelayed( this, 3 * 1000 );
+            }
+        }, 3 * 1000 );
 
     }
 
     public static String getToken(){
         return Token;
+    }
+
+    public ArrayList<Tasks> getListTask(){
+        return taskLista;
     }
 
     @Override
@@ -321,8 +348,7 @@ public class MainActivity extends AppCompatActivity implements TasksListFragment
         }
         if(jj.getString("status").equals("item created")){
             Toast.makeText(this,"Item created",Toast.LENGTH_SHORT).show();
-            finish();
-            startActivity(getIntent());
+
         }
         if(jj.getString("status").equals("item created error")){
             Toast.makeText(this,"Item created error",Toast.LENGTH_SHORT).show();
@@ -332,43 +358,48 @@ public class MainActivity extends AppCompatActivity implements TasksListFragment
         }
         if (jj.getString("status").equals("item deleted")){
             Toast.makeText(this,"Item deleted",Toast.LENGTH_SHORT).show();
-            finish();
-            startActivity(getIntent());
+
         }
         if (jj.getString("status").equals("item deleted error")){
             Toast.makeText(this,"Item deleted error",Toast.LENGTH_SHORT).show();
         }
         if (jj.getString("status").equals("token expired error")){
-            Toast.makeText(this,"Token has expired. Please log in again",Toast.LENGTH_SHORT).show();
+            finish();
         }
         if (jj.getString("status").equals("invalid token")){
-            Toast.makeText(this,"Invalid token. Session error",Toast.LENGTH_SHORT).show();
+            finish();
         }
 
 
     }
     private void responce_manage(JSONArray jsonArray) throws JSONException {
 
-        taskLista.clear();
+        ArrayList<Tasks> taskLista_temp = new ArrayList<>(0);
+
 
         for (int i = 0; i < jsonArray.length(); i++) {
 
             if(!jsonArray.getJSONObject(i).isNull("completed_at")) {
-                taskLista.add(new Tasks(jsonArray.getJSONObject(i).getInt("id"), jsonArray.getJSONObject(i).getString("title"), jsonArray.getJSONObject(i).getString("description"), jsonArray.getJSONObject(i).getString("completed_at")));
+                taskLista_temp.add(new Tasks(jsonArray.getJSONObject(i).getInt("id"), jsonArray.getJSONObject(i).getString("title"), jsonArray.getJSONObject(i).getString("description"), jsonArray.getJSONObject(i).getString("completed_at")));
             }else{
-                taskLista.add(new Tasks(jsonArray.getJSONObject(i).getInt("id"), jsonArray.getJSONObject(i).getString("title"), jsonArray.getJSONObject(i).getString("description"),  "x"));
+                taskLista_temp.add(new Tasks(jsonArray.getJSONObject(i).getInt("id"), jsonArray.getJSONObject(i).getString("title"), jsonArray.getJSONObject(i).getString("description"),  "x"));
             }
         }
-        for(int i =0; i<taskLista.size();i++) System.out.println(taskLista.get(i).getName()+ " "+ taskLista.get(i).getId() + " "+  taskLista.get(i).getCompleted_at()+ " ");
 
-        setContentView(R.layout.activity_main);
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-               startAddItem();
+        if (!taskLista_temp.equals(taskLista)){
+            if(isActivityVisible()){
+                taskLista=taskLista_temp;
+
+                TasksListFragment details = new TasksListFragment();
+                android.support.v4.app.FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+                ft.replace(R.id.fragment_container_list, details);
+                ft.commit();
+
             }
-        });
+
+
+        }
+
     }
 
     private void startAddItem() {
@@ -386,6 +417,25 @@ public class MainActivity extends AppCompatActivity implements TasksListFragment
             }
         }
 
+    }
+    protected boolean isActivityVisible() {
+        if (this != null) {
+            Class klass = this.getClass();
+            while (klass != null) {
+                try {
+                    Field field = klass.getDeclaredField("mResumed");
+                    field.setAccessible(true);
+                    Object obj = field.get(this);
+                    return (Boolean)obj;
+                } catch (NoSuchFieldException exception1) {
+//                Log.e(TAG, exception1.toString());
+                } catch (IllegalAccessException exception2) {
+//                Log.e(TAG, exception2.toString());
+                }
+                klass = klass.getSuperclass();
+            }
+        }
+        return false;
     }
 
 

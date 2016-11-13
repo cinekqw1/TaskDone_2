@@ -21,11 +21,10 @@
         xmlns:android="http://schemas.android.com/apk/res/android">
 
 
-        <fragment
-            class="com.example.marcin.teskdone_2.TasksListFragment"
-            android:id="@+id/list_frag"
+        <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
+            android:layout_height="wrap_content"
+            android:id="@+id/fragment_container_list" />
 
     </LinearLayout>
 
