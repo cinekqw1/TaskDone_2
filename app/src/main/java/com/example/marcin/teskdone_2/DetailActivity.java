@@ -33,7 +33,7 @@ public class DetailActivity extends AppCompatActivity implements TasksDetailFrag
 
     @Override
     public void buttonCompleteClicked(int id) {
-        //Toast.makeText(this,"comp",Toast.LENGTH_SHORT).show();
+        new BackgroundService(this).execute("complete","https://shopping-rails-app.herokuapp.com/api/complete",MainActivity.getToken(),String.valueOf(id));
     }
 
     @Override

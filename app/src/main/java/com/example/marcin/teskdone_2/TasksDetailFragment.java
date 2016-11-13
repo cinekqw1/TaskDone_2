@@ -3,6 +3,7 @@ package com.example.marcin.teskdone_2;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -61,11 +62,15 @@ public class TasksDetailFragment extends Fragment implements View.OnClickListene
         View view = getView();
         if (view!=null) {
             TextView title = (TextView) view.findViewById(R.id.textTitle);
+            TextView description = (TextView) view.findViewById(R.id.textDescription);
+            TextView complete = (TextView) view.findViewById(R.id.textcomplete);
             Tasks workout = MainActivity.taskLista.get((int) workoutId);
             title.setText(workout.getName());
-            TextView description = (TextView) view.findViewById(R.id.textDescription);
             description.setText(workout.getDescription());
-
+            if(!workout.getCompleted_at().equals("x")) {
+                complete.setText("Done!");
+                complete.setTextColor(Color.GREEN);
+            }
             IB_coplete = (ImageButton) getView().findViewById(R.id.imageButton_complete);
             IB_delete = (ImageButton) getView().findViewById(R.id.imageButton_delete);
             IB_coplete.setOnClickListener(this);

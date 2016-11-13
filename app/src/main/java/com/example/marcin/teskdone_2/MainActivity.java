@@ -41,6 +41,7 @@ public class MainActivity extends AppCompatActivity implements TasksListFragment
     private String URL_logout = "https://shopping-rails-app.herokuapp.com/api/logout";
     private String URL_create_item = "https://shopping-rails-app.herokuapp.com/api/createitem";
     private String URL_delete = "https://shopping-rails-app.herokuapp.com/api/destroy";
+    private String URL_complete = "https://shopping-rails-app.herokuapp.com/api/complete";
 
     public static ArrayList<Tasks> taskLista = new ArrayList<>(0);
 
@@ -137,13 +138,13 @@ public class MainActivity extends AppCompatActivity implements TasksListFragment
 
     @Override
     public void buttonCompleteClicked(int id) {
-
+        new BackgroundService((CallbackBackgroundService) this).execute("complete",URL_complete,Token,String.valueOf(id));
     }
 
     @Override
     public void callbackBackgroundService(String result) {
         View view = getWindow().getDecorView().getRootView();
-        Snackbar.make(view, "item deleted error", Snackbar.LENGTH_LONG).show();
+        Snackbar.make(view, result, Snackbar.LENGTH_LONG).show();
     }
 
 
@@ -169,6 +170,7 @@ public class MainActivity extends AppCompatActivity implements TasksListFragment
                 if(urls[0].equals("logout")){
                     return push_json_items(urls[1], urls[2]);
                 }
+
 
             } catch (IOException e) {
                 return "{\"status\":\"no connection to server\"}";
@@ -342,12 +344,14 @@ public class MainActivity extends AppCompatActivity implements TasksListFragment
 
     private void responce_menage(JSONObject jj) throws JSONException {
 
+        View view = getWindow().getDecorView().getRootView();
+
         if(jj.getString("status").equals("succesfull log out")){
             Toast.makeText(this,"Successful logout",Toast.LENGTH_SHORT).show();
             finish();
         }
         if(jj.getString("status").equals("item created")){
-            Toast.makeText(this,"Item created",Toast.LENGTH_SHORT).show();
+            Snackbar.make(view, "The item has created", Snackbar.LENGTH_LONG).show();
 
         }
         if(jj.getString("status").equals("item created error")){
@@ -364,10 +368,18 @@ public class MainActivity extends AppCompatActivity implements TasksListFragment
             Toast.makeText(this,"Item deleted error",Toast.LENGTH_SHORT).show();
         }
         if (jj.getString("status").equals("token expired error")){
+            Toast.makeText(this,"Session expired. Lo gin again",Toast.LENGTH_SHORT).show();
             finish();
         }
         if (jj.getString("status").equals("invalid token")){
+            Toast.makeText(this,"Token session error. Contact to admin",Toast.LENGTH_SHORT).show();
             finish();
+        }
+        if (jj.getString("status").equals("marked succesfull")){
+            Toast.makeText(this,"checked!",Toast.LENGTH_SHORT).show();
+        }
+        if (jj.getString("status").equals("marked error")){
+            Toast.makeText(this,"checked error",Toast.LENGTH_SHORT).show();
         }
 
 

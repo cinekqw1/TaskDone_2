@@ -51,6 +51,9 @@ public class BackgroundService extends AsyncTask<String, Void, String> {
             if(urls[0].equals("delete")){
                 return push_json_delete_item(urls[1],urls[2],urls[3]);
             }
+            if(urls[0].equals("complete")){
+                return push_json_delete_item(urls[1],urls[2],urls[3]);
+            }
         } catch (IOException e) {
             return "{\"status\":\"no connection to server\"}";
         } catch (JSONException e) {
