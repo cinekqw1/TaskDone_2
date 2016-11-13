@@ -40,7 +40,7 @@ public class DetailActivity extends AppCompatActivity implements TasksDetailFrag
     public void callbackBackgroundService(String result) {
 
         if(result.equals("item deleted")){
-            
+
             finish();
         }
         if(result.equals("item deleted error")){

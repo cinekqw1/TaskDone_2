@@ -316,27 +316,33 @@ public class MainActivity extends AppCompatActivity implements TasksListFragment
     private void responce_menage(JSONObject jj) throws JSONException {
 
         if(jj.getString("status").equals("succesfull log out")){
-            Toast.makeText(this,"successful logout",Toast.LENGTH_SHORT).show();
+            Toast.makeText(this,"Successful logout",Toast.LENGTH_SHORT).show();
             finish();
         }
         if(jj.getString("status").equals("item created")){
-            Toast.makeText(this,"item created",Toast.LENGTH_SHORT).show();
+            Toast.makeText(this,"Item created",Toast.LENGTH_SHORT).show();
             finish();
             startActivity(getIntent());
         }
         if(jj.getString("status").equals("item created error")){
-            Toast.makeText(this,"item created error",Toast.LENGTH_SHORT).show();
+            Toast.makeText(this,"Item created error",Toast.LENGTH_SHORT).show();
         }
         if(jj.getString("status").equals("no connection to server")){
-            Toast.makeText(this,"no connection to server",Toast.LENGTH_SHORT).show();
+            Toast.makeText(this,"No connection to server",Toast.LENGTH_SHORT).show();
         }
         if (jj.getString("status").equals("item deleted")){
-            Toast.makeText(this,"item deleted",Toast.LENGTH_SHORT).show();
+            Toast.makeText(this,"Item deleted",Toast.LENGTH_SHORT).show();
             finish();
             startActivity(getIntent());
         }
         if (jj.getString("status").equals("item deleted error")){
-            Toast.makeText(this,"item deleted error",Toast.LENGTH_SHORT).show();
+            Toast.makeText(this,"Item deleted error",Toast.LENGTH_SHORT).show();
+        }
+        if (jj.getString("status").equals("token expired error")){
+            Toast.makeText(this,"Token has expired. Please log in again",Toast.LENGTH_SHORT).show();
+        }
+        if (jj.getString("status").equals("invalid token")){
+            Toast.makeText(this,"Invalid token. Session error",Toast.LENGTH_SHORT).show();
         }
 
 
