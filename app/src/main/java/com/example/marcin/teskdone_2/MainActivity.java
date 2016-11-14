@@ -29,6 +29,7 @@ import java.lang.reflect.Field;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -45,6 +46,8 @@ public class MainActivity extends AppCompatActivity implements TasksListFragment
     private String URL_complete = "https://shopping-rails-app.herokuapp.com/api/complete";
 
     public static ArrayList<Tasks> taskLista = new ArrayList<>(0);
+    public static ArrayList<Tasks> taskLista_to_do = new ArrayList<>(0);
+    public static ArrayList<Tasks> taskLista_done = new ArrayList<>(0);
 
 
     @Override
@@ -75,9 +78,9 @@ public class MainActivity extends AppCompatActivity implements TasksListFragment
                     new MainActivity.CallServiceTask().execute("items", URL, Token);
                 }
 
-                handler.postDelayed( this, 3 * 1000 );
+                handler.postDelayed( this, 5 * 1000 );
             }
-        }, 3 * 1000 );
+        }, 5 * 1000 );
 
     }
 
@@ -112,7 +115,23 @@ public class MainActivity extends AppCompatActivity implements TasksListFragment
         }
     }
 
+    @Override
+    public void onResume(){
+        super.onResume();
+        threadRun = true;
 
+    }
+
+    @Override
+    public void onPause(){
+        super.onPause();
+        threadRun = false;
+    }
+    @Override
+    public void onStop(){
+        super.onStop();
+        threadRun = false;
+    }
     @Override
     public void itemClicked(long id) {
         View fragmentContainer = findViewById(R.id.fragment_container);
@@ -361,7 +380,18 @@ public class MainActivity extends AppCompatActivity implements TasksListFragment
             Toast.makeText(this,"Item created error",Toast.LENGTH_SHORT).show();
         }
         if(jj.getString("status").equals("no connection to server")){
-            Toast.makeText(this,"No connection to server",Toast.LENGTH_SHORT).show();
+
+            threadRun = false;
+            Snackbar snackbar = Snackbar
+                    .make(view, "connection lost", Snackbar.LENGTH_INDEFINITE)
+                    .setAction("Refresh", new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            refresh();
+                        }
+                    });
+
+            snackbar.show();
         }
         if (jj.getString("status").equals("item deleted")){
             Toast.makeText(this,"Item deleted",Toast.LENGTH_SHORT).show();
@@ -371,7 +401,7 @@ public class MainActivity extends AppCompatActivity implements TasksListFragment
             Toast.makeText(this,"Item deleted error",Toast.LENGTH_SHORT).show();
         }
         if (jj.getString("status").equals("token expired error")){
-            Toast.makeText(this,"Session expired. Lo gin again",Toast.LENGTH_SHORT).show();
+            Toast.makeText(this,"Session expired. Login again",Toast.LENGTH_SHORT).show();
             finish();
         }
         if (jj.getString("status").equals("invalid token")){
@@ -380,6 +410,7 @@ public class MainActivity extends AppCompatActivity implements TasksListFragment
         }
         if (jj.getString("status").equals("marked succesfull")){
             Toast.makeText(this,"checked!",Toast.LENGTH_SHORT).show();
+
         }
         if (jj.getString("status").equals("marked error")){
             Toast.makeText(this,"checked error",Toast.LENGTH_SHORT).show();
@@ -387,6 +418,11 @@ public class MainActivity extends AppCompatActivity implements TasksListFragment
 
 
     }
+
+    private void refresh() {
+        threadRun = true;
+    }
+
     private void responce_manage(JSONArray jsonArray) throws JSONException {
 
         ArrayList<Tasks> taskLista_temp = new ArrayList<>(0);
@@ -398,21 +434,43 @@ public class MainActivity extends AppCompatActivity implements TasksListFragment
                 taskLista_temp.add(new Tasks(jsonArray.getJSONObject(i).getInt("id"), jsonArray.getJSONObject(i).getString("title"), jsonArray.getJSONObject(i).getString("description"), jsonArray.getJSONObject(i).getString("completed_at")));
             }else{
                 taskLista_temp.add(new Tasks(jsonArray.getJSONObject(i).getInt("id"), jsonArray.getJSONObject(i).getString("title"), jsonArray.getJSONObject(i).getString("description"),  "x"));
+
             }
         }
 
-        if (!taskLista_temp.equals(taskLista)){
+
+
+        if (!equalLists(taskLista_temp,taskLista)){
+
             if(isActivityVisible()){
                 taskLista=taskLista_temp;
+
+                taskLista_to_do.clear();
+                taskLista_done.clear();
+                for (int i = 0; i < taskLista.size(); i++) {
+
+                    if(!taskLista.get(i).getCompleted_at().equals("x")) {
+                        taskLista_done.add(new Tasks(jsonArray.getJSONObject(i).getInt("id"), jsonArray.getJSONObject(i).getString("title"), jsonArray.getJSONObject(i).getString("description"), jsonArray.getJSONObject(i).getString("completed_at")));
+                    }else{
+                        taskLista_to_do.add(new Tasks(jsonArray.getJSONObject(i).getInt("id"), jsonArray.getJSONObject(i).getString("title"), jsonArray.getJSONObject(i).getString("description"),  "x"));
+
+                    }
+                }
 
                 TasksListFragment details = new TasksListFragment();
                 android.support.v4.app.FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
                 ft.replace(R.id.fragment_container_list, details);
                 ft.commit();
 
+
+                TaskDoneListFragment details2 = new TaskDoneListFragment();
+                android.support.v4.app.FragmentTransaction ft2 = getSupportFragmentManager().beginTransaction();
+                ft2.replace(R.id.fragment_container_list_done, details2);
+                ft2.commit();
+
             }
 
-
+            for (int i = 0; i < jsonArray.length(); i++) System.out.println(taskLista.get(i).getName() + " " +taskLista.get(i).getCompleted_at() );
         }
 
     }
@@ -451,6 +509,20 @@ public class MainActivity extends AppCompatActivity implements TasksListFragment
             }
         }
         return false;
+    }
+
+    public boolean equalLists(ArrayList<Tasks> one, ArrayList<Tasks> two){
+
+        if (one.size()!=two.size()) return false;
+        for(int i =0; i<one.size();i++)
+        {
+            if(one.get(i).getId() != two.get(i).getId()) return false ;
+        }
+        for(int i =0; i<one.size();i++)
+        {
+            if(one.get(i).getCompleted_at().equals(two.get(i).getCompleted_at())) return false ;
+        }
+        return true;
     }
 
 

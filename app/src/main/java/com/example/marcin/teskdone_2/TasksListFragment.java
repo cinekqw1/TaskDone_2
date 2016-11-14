@@ -13,6 +13,8 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import java.util.ArrayList;
+
 /**
  * A simple {@link Fragment} subclass.
  */
@@ -34,9 +36,13 @@ public class TasksListFragment extends ListFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        String[] names = new String[MainActivity.taskLista.size()];
-        for (int i = 0;i<names.length;i++){
-            names[i] = MainActivity.taskLista.get(i).getName();
+
+
+        String[] names = new String[MainActivity.taskLista_to_do.size()];
+        for (int i = 0;i<MainActivity.taskLista_to_do.size();i++){
+
+            names[i] = MainActivity.taskLista_to_do.get(i).getName();
+
         }
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(
                 inflater.getContext(),android.R.layout.simple_list_item_1,names);

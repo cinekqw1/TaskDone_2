@@ -34,6 +34,7 @@ public class DetailActivity extends AppCompatActivity implements TasksDetailFrag
     @Override
     public void buttonCompleteClicked(int id) {
         new BackgroundService(this).execute("complete","https://shopping-rails-app.herokuapp.com/api/complete",MainActivity.getToken(),String.valueOf(id));
+
     }
 
     @Override
@@ -46,6 +47,10 @@ public class DetailActivity extends AppCompatActivity implements TasksDetailFrag
         if(result.equals("item deleted error")){
             View view = getWindow().getDecorView().getRootView();
             Snackbar.make(view, "item deleted error", Snackbar.LENGTH_LONG).show();
+        }
+        if(result.equals("marked succesfull")){
+
+            finish();
         }
     }
 }

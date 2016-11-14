@@ -64,7 +64,7 @@ public class TasksDetailFragment extends Fragment implements View.OnClickListene
             TextView title = (TextView) view.findViewById(R.id.textTitle);
             TextView description = (TextView) view.findViewById(R.id.textDescription);
             TextView complete = (TextView) view.findViewById(R.id.textcomplete);
-            Tasks workout = MainActivity.taskLista.get((int) workoutId);
+            Tasks workout = MainActivity.taskLista_to_do.get((int) workoutId);
             title.setText(workout.getName());
             description.setText(workout.getDescription());
             if(!workout.getCompleted_at().equals("x")) {
@@ -101,11 +101,11 @@ public class TasksDetailFragment extends Fragment implements View.OnClickListene
         switch (v.getId()){
 
             case R.id.imageButton_complete:{
-                Tasks item = MainActivity.taskLista.get((int) workoutId);
+                Tasks item = MainActivity.taskLista_to_do.get((int) workoutId);
                 if(listener!=null) listener.buttonCompleteClicked(item.getId());
             }break;
             case R.id.imageButton_delete:{
-                Tasks item = MainActivity.taskLista.get((int) workoutId);
+                Tasks item = MainActivity.taskLista_to_do.get((int) workoutId);
                 if(listener!=null) listener.buttonDeleteClicked(item.getId());
             }break;
 
