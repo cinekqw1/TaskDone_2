@@ -37,6 +37,7 @@ public class MainActivity extends AppCompatActivity implements TasksListFragment
     private JSONObject Json_object;
     private static final int MY_REQUEST_CODE = 123;
     private static String Token;
+    private boolean threadRun = true;
     private String URL = "https://shopping-rails-app.herokuapp.com/api/items";
     private String URL_logout = "https://shopping-rails-app.herokuapp.com/api/logout";
     private String URL_create_item = "https://shopping-rails-app.herokuapp.com/api/createitem";
@@ -70,9 +71,9 @@ public class MainActivity extends AppCompatActivity implements TasksListFragment
 
             @Override
             public void run() {
-
-                    new MainActivity.CallServiceTask().execute("items",URL,Token);
-
+                if(threadRun) {
+                    new MainActivity.CallServiceTask().execute("items", URL, Token);
+                }
 
                 handler.postDelayed( this, 3 * 1000 );
             }
@@ -101,6 +102,7 @@ public class MainActivity extends AppCompatActivity implements TasksListFragment
         switch (item.getItemId()) {
             case R.id.log_out:
             {
+
                 new MainActivity.CallServiceTask().execute("logout",URL_logout,Token);
 
             }
@@ -347,6 +349,7 @@ public class MainActivity extends AppCompatActivity implements TasksListFragment
         View view = getWindow().getDecorView().getRootView();
 
         if(jj.getString("status").equals("succesfull log out")){
+            threadRun = false;
             Toast.makeText(this,"Successful logout",Toast.LENGTH_SHORT).show();
             finish();
         }

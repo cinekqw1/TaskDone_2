@@ -3,6 +3,7 @@ package com.example.marcin.teskdone_2;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
@@ -29,6 +30,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener
 
 
     private Button B_signin;
+    private Button B_signup;
     private EditText ET_Email;
     private EditText ET_password;
     private JSONObject Json_object;
@@ -67,7 +69,9 @@ public class Login extends AppCompatActivity implements View.OnClickListener
         ET_Email = (EditText) findViewById(R.id.editText_email);
         ET_password = (EditText) findViewById(R.id.editText_password);
         B_signin = (Button) findViewById(R.id.button_signin);
+        B_signup = (Button) findViewById(R.id.button_signup);
         B_signin.setOnClickListener(this);
+        B_signup.setOnClickListener(this);
 
     }
 
@@ -97,6 +101,11 @@ public class Login extends AppCompatActivity implements View.OnClickListener
                     Toast.makeText(this,"empty field",Toast.LENGTH_SHORT).show();
                 }
             }break;
+            case R.id.button_signup:{
+                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://shopping-rails-app.herokuapp.com/users/sign_up"));
+                startActivity(browserIntent);
+            }break;
+
 
 
         }
