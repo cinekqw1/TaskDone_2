@@ -24,29 +24,35 @@
             android:layout_height="wrap_content"
             xmlns:android="http://schemas.android.com/apk/res/android">
 
+
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="To do:"
-                android:gravity="center"/>
+                android:textSize="25sp"
+                android:textStyle="normal|bold|italic" />
 
             <FrameLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_weight="2"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:id="@+id/fragment_container_list" />
+
 
             <TextView
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Done"
-                android:gravity="center"/>
+                android:layout_height="match_parent"
+                android:text="Done:"
+                android:textSize="25sp"
+                android:textStyle="normal|bold|italic" />
+
 
             <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_weight="2"
+                android:layout_weight="15"
                 android:id="@+id/fragment_container_list_done" />
+
 
         </LinearLayout>
 

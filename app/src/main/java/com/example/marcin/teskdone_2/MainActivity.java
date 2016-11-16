@@ -78,9 +78,9 @@ public class MainActivity extends AppCompatActivity implements TasksListFragment
                     new MainActivity.CallServiceTask().execute("items", URL, Token);
                 }
 
-                handler.postDelayed( this, 5 * 1000 );
+                handler.postDelayed( this, 3 * 1000 );
             }
-        }, 5 * 1000 );
+        }, 3 * 1000 );
 
     }
 
@@ -234,9 +234,6 @@ public class MainActivity extends AppCompatActivity implements TasksListFragment
                 //OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream());
                 //wr.write(String.valueOf(Json_object));
                 //wr.flush();
-
-
-
 
 
                 StringBuilder sb = new StringBuilder();
