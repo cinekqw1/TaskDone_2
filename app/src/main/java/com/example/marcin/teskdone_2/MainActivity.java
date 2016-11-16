@@ -10,8 +10,10 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.*;
 import android.support.v4.app.ListFragment;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -32,8 +34,30 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import android.app.Activity;
+import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.view.ViewPager;
+import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 
-public class MainActivity extends AppCompatActivity implements TasksListFragment.TasksListListener, TasksDetailFragment.ButtonListener, CallbackBackgroundService{
+import java.util.List;
+import java.util.Vector;
+
+import it.neokree.materialtabs.MaterialTab;
+import it.neokree.materialtabs.MaterialTabHost;
+import it.neokree.materialtabs.MaterialTabListener;
+
+import it.neokree.materialtabs.MaterialTabHost;
+
+import static com.example.marcin.teskdone_2.R.id.tabHost;
+import static com.example.marcin.teskdone_2.R.id.toolBar;
+import static com.example.marcin.teskdone_2.R.id.viewPager;
+
+public class MainActivity extends AppCompatActivity implements TasksListFragment.TasksListListener, TasksDetailFragment.ButtonListener, CallbackBackgroundService, MaterialTabListener{
 
     private JSONObject Json_object;
     private static final int MY_REQUEST_CODE = 123;
@@ -49,18 +73,42 @@ public class MainActivity extends AppCompatActivity implements TasksListFragment
     public static ArrayList<Tasks> taskLista_to_do = new ArrayList<>(0);
     public static ArrayList<Tasks> taskLista_done = new ArrayList<>(0);
 
+    List<Fragment> fragments = new Vector<Fragment>();
+    List<String> fragments_title = new Vector<String>();
+    MaterialTabHost tabHost;
+    ViewPager viewPager;
+    ViewPagerAdapter androidAdapter;
+    Toolbar toolBar;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        setContentView(R.layout.activity_main);
+
         Intent intent = getIntent();
         Token = intent.getStringExtra("token");
 
+        //android toolbar
+        toolBar = (android.support.v7.widget.Toolbar) this.findViewById(R.id.toolBar);
+        this.setSupportActionBar(toolBar);
+
+        //tab host
+        tabHost = (MaterialTabHost) this.findViewById(R.id.tabHost);
+        viewPager = (ViewPager) this.findViewById(R.id.viewPager);
+
+
+        fragments.add(Fragment.instantiate(this, TasksListFragment.class.getName()));
+        fragments.add(Fragment.instantiate(this, TaskDoneListFragment.class.getName()));
+
+
+        fragments_title.add("To do");
+        fragments_title.add("Done");
 
 
 
-        setContentView(R.layout.activity_main);
+
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -82,6 +130,52 @@ public class MainActivity extends AppCompatActivity implements TasksListFragment
             }
         }, 3 * 1000 );
 
+    }
+    //tab on selected
+    @Override
+    public void onTabSelected(MaterialTab materialTab) {
+
+        viewPager.setCurrentItem(materialTab.getPosition());
+    }
+
+    //tab on reselected
+    @Override
+    public void onTabReselected(MaterialTab materialTab) {
+
+    }
+
+    //tab on unselected
+    @Override
+    public void onTabUnselected(MaterialTab materialTab) {
+
+    }
+
+    private class ViewPagerAdapter extends FragmentStatePagerAdapter {
+
+        private List<Fragment> mFragments;
+        private List<String> mTitles;
+
+
+        public ViewPagerAdapter(FragmentManager fragmentManager, List<Fragment> fragments, List<String> titles) {
+            super(fragmentManager);
+            mFragments = fragments;
+            mTitles = titles;
+        }
+
+        public Fragment getItem(int num) {
+            return mFragments.get(num);
+        }
+
+        @Override
+        public int getCount() {
+            return mFragments.size();
+        }
+
+        @Override
+        public CharSequence getPageTitle(int tabposition) {
+            return mTitles.get(tabposition);
+            //return "Tab " + tabposition;
+        }
     }
 
     public static String getToken(){
@@ -172,12 +266,9 @@ public class MainActivity extends AppCompatActivity implements TasksListFragment
     public class CallServiceTask extends AsyncTask<String, Void, String> {
 
 
-
         @Override
         protected void onPreExecute() {
-
         }
-
 
         protected String doInBackground(String... urls)
         {
@@ -192,23 +283,18 @@ public class MainActivity extends AppCompatActivity implements TasksListFragment
                     return push_json_items(urls[1], urls[2]);
                 }
 
-
             } catch (IOException e) {
                 return "{\"status\":\"no connection to server\"}";
             } catch (JSONException e) {
                 e.printStackTrace();
             }
             return "{\"status\":\"no connection to server\"}";
-
         }
 
         private String push_json_items(String myurl,String token) throws IOException, JSONException {
 
-
             InputStream is = null;
-
             int len = 500;
-
             try {
                 java.net.URL url = new URL(myurl);
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -229,12 +315,10 @@ public class MainActivity extends AppCompatActivity implements TasksListFragment
                             + " ,Value : " + entry.getValue());
                 }
 
-
                 //wysyłanie:
                 //OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream());
                 //wr.write(String.valueOf(Json_object));
                 //wr.flush();
-
 
                 StringBuilder sb = new StringBuilder();
                 int HttpResult = conn.getResponseCode();
@@ -257,17 +341,12 @@ public class MainActivity extends AppCompatActivity implements TasksListFragment
                 }
             }
 
-
         }
 
         private String  push_json_create_item(String myurl,String token,String title, String description) throws IOException, JSONException {
 
-
             Json_object = Json_build(title,description);
-
-
             InputStream is = null;
-
 
             try {
                 java.net.URL url = new URL(myurl);
@@ -280,17 +359,10 @@ public class MainActivity extends AppCompatActivity implements TasksListFragment
                 conn.setRequestMethod("POST");
                 conn.connect();
 
-
-
-
                 //wysyłanie:
                 OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream());
                 wr.write(String.valueOf(Json_object));
                 wr.flush();
-
-
-
-
 
                 StringBuilder sb = new StringBuilder();
                 int HttpResult = conn.getResponseCode();
@@ -313,10 +385,7 @@ public class MainActivity extends AppCompatActivity implements TasksListFragment
                 }
             }
 
-
         }
-
-
 
 
         @Override
@@ -435,12 +504,13 @@ public class MainActivity extends AppCompatActivity implements TasksListFragment
             }
         }
 
-
-
-        if (!equalLists(taskLista_temp,taskLista)){
-
+        for (int i = 0; i < taskLista_temp.size(); i++) System.out.println(taskLista_temp.get(i).getName() + " " +taskLista_temp.get(i).getCompleted_at() );
+        for (int i = 0; i < taskLista.size(); i++) System.out.println(taskLista.get(i).getName() + " " +taskLista.get(i).getCompleted_at() );
+        if (ifDiffrent(taskLista_temp,taskLista)){
+            System.out.print("@@@@@@odswiezam!@@@@@@@@@@");
+            taskLista=taskLista_temp;
             if(isActivityVisible()){
-                taskLista=taskLista_temp;
+
 
                 taskLista_to_do.clear();
                 taskLista_done.clear();
@@ -454,6 +524,7 @@ public class MainActivity extends AppCompatActivity implements TasksListFragment
                     }
                 }
 
+                /*
                 TasksListFragment details = new TasksListFragment();
                 android.support.v4.app.FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
                 ft.replace(R.id.fragment_container_list, details);
@@ -464,10 +535,26 @@ public class MainActivity extends AppCompatActivity implements TasksListFragment
                 android.support.v4.app.FragmentTransaction ft2 = getSupportFragmentManager().beginTransaction();
                 ft2.replace(R.id.fragment_container_list_done, details2);
                 ft2.commit();
+                */
+                androidAdapter = new ViewPagerAdapter(getSupportFragmentManager(),fragments,fragments_title);
+                viewPager.setAdapter(androidAdapter);
+                viewPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
+                    @Override
+                    public void onPageSelected(int tabposition) {
+                        tabHost.setSelectedNavigationItem(tabposition);
+                    }
+                });
+
+                for (int i = 0; i < androidAdapter.getCount(); i++) {
+                    tabHost.addTab(
+                            tabHost.newTab()
+                                    .setText(androidAdapter.getPageTitle(i))
+                                    .setTabListener(this)
+                    );
+                }
 
             }
 
-            for (int i = 0; i < jsonArray.length(); i++) System.out.println(taskLista.get(i).getName() + " " +taskLista.get(i).getCompleted_at() );
         }
 
     }
@@ -508,21 +595,21 @@ public class MainActivity extends AppCompatActivity implements TasksListFragment
         return false;
     }
 
-    public boolean equalLists(ArrayList<Tasks> one, ArrayList<Tasks> two){
+    public boolean ifDiffrent(ArrayList<Tasks> one, ArrayList<Tasks> two){
 
-        if (one.size()!=two.size()) return false;
-        for(int i =0; i<one.size();i++)
-        {
-            if(one.get(i).getId() != two.get(i).getId()) return false ;
+        if (one.size()!=two.size()){
+            return true;
         }
-        for(int i =0; i<one.size();i++)
-        {
-            if(one.get(i).getCompleted_at().equals(two.get(i).getCompleted_at())) return false ;
+        else {
+            for (int i = 0; i < one.size(); i++) {
+                if (one.get(i).getId() != two.get(i).getId()) return true;
+            }
+            for (int i = 0; i < one.size(); i++) {
+                if (!one.get(i).getCompleted_at().equals(two.get(i).getCompleted_at())) return true;
+            }
+
+            return false;
         }
-        return true;
     }
-
-
-
 
 }
