@@ -63,14 +63,11 @@ public class TasksDetailFragment extends Fragment implements View.OnClickListene
         if (view!=null) {
             TextView title = (TextView) view.findViewById(R.id.textTitle);
             TextView description = (TextView) view.findViewById(R.id.textDescription);
-            TextView complete = (TextView) view.findViewById(R.id.textcomplete);
+
             Tasks workout = MainActivity.taskLista_to_do.get((int) workoutId);
             title.setText(workout.getName());
             description.setText(workout.getDescription());
-            if(!workout.getCompleted_at().equals("x")) {
-                complete.setText("Done!");
-                complete.setTextColor(Color.GREEN);
-            }
+
             IB_coplete = (ImageButton) getView().findViewById(R.id.imageButton_complete);
             IB_delete = (ImageButton) getView().findViewById(R.id.imageButton_delete);
             IB_coplete.setOnClickListener(this);

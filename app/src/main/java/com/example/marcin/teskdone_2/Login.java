@@ -9,8 +9,10 @@ import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -23,16 +25,19 @@ import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+import butterknife.ButterKnife;
+import butterknife.InjectView;
+
 
 
 public class Login extends AppCompatActivity implements View.OnClickListener
 {
 
 
+    @InjectView(R.id.input_email) EditText ET_Email;
+    @InjectView(R.id.input_password) EditText ET_password;
+    public TextView sign_up ;
     private Button B_signin;
-    private Button B_signup;
-    private EditText ET_Email;
-    private EditText ET_password;
     private JSONObject Json_object;
     private  JSONObject Json_response;
     private String URL = "https://shopping-rails-app.herokuapp.com/api";
@@ -45,15 +50,27 @@ public class Login extends AppCompatActivity implements View.OnClickListener
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-
+        this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
         inicialize();
 
         if(savedInstanceState!=null)
         {
             ET_Email.setText(savedInstanceState.getString("email"));
             ET_password.setText((savedInstanceState.getString("password")));
+
         }
+
+        sign_up.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://shopping-rails-app.herokuapp.com/users/sign_up"));
+                startActivity(browserIntent);
+            }
+        });
     }
+
+
+
     @Override
     protected void onSaveInstanceState (Bundle outState)
     {
@@ -66,14 +83,15 @@ public class Login extends AppCompatActivity implements View.OnClickListener
 
     private void inicialize() {
 
-        ET_Email = (EditText) findViewById(R.id.editText_email);
-        ET_password = (EditText) findViewById(R.id.editText_password);
-        B_signin = (Button) findViewById(R.id.button_signin);
-        B_signup = (Button) findViewById(R.id.button_signup);
+        ET_Email = (EditText) findViewById(R.id.input_email);
+        ET_password = (EditText) findViewById(R.id.input_password);
+        B_signin = (Button) findViewById(R.id.btn_login);
+        sign_up = (TextView) findViewById(R.id.link_signup);
         B_signin.setOnClickListener(this);
-        B_signup.setOnClickListener(this);
+        //B_signup.setOnClickListener(this);
 
     }
+
 
 
 
@@ -81,7 +99,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener
     public void onClick(View v) {
 
         switch(v.getId()) {
-            case R.id.button_signin:
+            case R.id.btn_login:
             {
                 if(!empty_field())
                 {
@@ -101,12 +119,6 @@ public class Login extends AppCompatActivity implements View.OnClickListener
                     Toast.makeText(this,"empty field",Toast.LENGTH_SHORT).show();
                 }
             }break;
-            case R.id.button_signup:{
-                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://shopping-rails-app.herokuapp.com/users/sign_up"));
-                startActivity(browserIntent);
-            }break;
-
-
 
         }
     }

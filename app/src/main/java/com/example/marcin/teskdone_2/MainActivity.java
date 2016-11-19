@@ -107,6 +107,23 @@ public class MainActivity extends AppCompatActivity implements TasksListFragment
         fragments_title.add("Done");
 
 
+        androidAdapter = new ViewPagerAdapter(getSupportFragmentManager(),fragments,fragments_title);
+        viewPager.setAdapter(androidAdapter);
+        viewPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
+            @Override
+            public void onPageSelected(int tabposition) {
+                tabHost.setSelectedNavigationItem(tabposition);
+            }
+        });
+
+        for (int i = 0; i < androidAdapter.getCount(); i++) {
+            tabHost.addTab(
+                    tabHost.newTab()
+                            .setText(androidAdapter.getPageTitle(i))
+                            .setTabListener(this)
+            );
+        }
+
 
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -131,7 +148,14 @@ public class MainActivity extends AppCompatActivity implements TasksListFragment
         }, 3 * 1000 );
 
     }
-    //tab on selected
+
+
+    @Override
+    public void onBackPressed()
+    {
+        new MainActivity.CallServiceTask().execute("logout",URL_logout,Token);
+    }
+
     @Override
     public void onTabSelected(MaterialTab materialTab) {
 
@@ -507,7 +531,6 @@ public class MainActivity extends AppCompatActivity implements TasksListFragment
         for (int i = 0; i < taskLista_temp.size(); i++) System.out.println(taskLista_temp.get(i).getName() + " " +taskLista_temp.get(i).getCompleted_at() );
         for (int i = 0; i < taskLista.size(); i++) System.out.println(taskLista.get(i).getName() + " " +taskLista.get(i).getCompleted_at() );
         if (ifDiffrent(taskLista_temp,taskLista)){
-            System.out.print("@@@@@@odswiezam!@@@@@@@@@@");
             taskLista=taskLista_temp;
             if(isActivityVisible()){
 
