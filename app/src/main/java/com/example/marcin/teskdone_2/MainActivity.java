@@ -3,8 +3,10 @@ package com.example.marcin.teskdone_2;
 import android.app.Activity;
 import android.app.FragmentTransaction;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Handler;
+import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
 
 import android.support.design.widget.Snackbar;
@@ -68,6 +70,7 @@ public class MainActivity extends AppCompatActivity implements TasksListFragment
     private String URL_create_item = "https://shopping-rails-app.herokuapp.com/api/createitem";
     private String URL_delete = "https://shopping-rails-app.herokuapp.com/api/destroy";
     private String URL_complete = "https://shopping-rails-app.herokuapp.com/api/complete";
+    private String URL_login = "https://shopping-rails-app.herokuapp.com/api";
 
     public static ArrayList<Tasks> taskLista = new ArrayList<>(0);
     public static ArrayList<Tasks> taskLista_to_do = new ArrayList<>(0);
@@ -306,6 +309,9 @@ public class MainActivity extends AppCompatActivity implements TasksListFragment
                 if(urls[0].equals("logout")){
                     return push_json_items(urls[1], urls[2]);
                 }
+                if(urls[0].equals("login")){
+                    return push_json_login(urls[1], urls[2], urls[3]);
+                }
 
             } catch (IOException e) {
                 return "{\"status\":\"no connection to server\"}";
@@ -411,6 +417,62 @@ public class MainActivity extends AppCompatActivity implements TasksListFragment
 
         }
 
+        private String push_json_login(String myurl,String Email, String Password) throws IOException, JSONException {
+
+            Json_object = Json_build(Email,Password);
+
+            InputStream is = null;
+
+            int len = 500;
+
+            try {
+                java.net.URL url = new URL(myurl);
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.setReadTimeout(10000 /* milliseconds */);
+                conn.setConnectTimeout(15000 /* milliseconds */);
+                conn.setRequestProperty("Content-Type", "application/json");
+                conn.setRequestProperty("Accept", "application/json");
+                conn.setRequestMethod("POST");
+                conn.connect();
+
+                //int response = conn.getResponseCode();
+                //Log.d(String.valueOf(this), "The response is: " + response);
+                // is = conn.getInputStream();
+
+                //wysyłanie:
+                OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream());
+                wr.write(String.valueOf(Json_object));
+                wr.flush();
+
+
+
+                // Convert the InputStream into a string
+                //String contentAsString = readIt(is, len);
+                //return contentAsString;
+
+                StringBuilder sb = new StringBuilder();
+                int HttpResult = conn.getResponseCode();
+                if (HttpResult == HttpURLConnection.HTTP_OK) {
+                    BufferedReader br = new BufferedReader(
+                            new InputStreamReader(conn.getInputStream(), "utf-8"));
+                    String line = null;
+                    while ((line = br.readLine()) != null) {
+                        sb.append(line + "\n");
+                    }
+                    br.close();
+                    return sb.toString();
+                } else {
+                    return conn.getResponseMessage().toString();
+                }
+
+            } finally {
+                if (is != null) {
+                    is.close();
+                }
+            }
+
+
+        }
 
         @Override
         protected void onPostExecute(String result) {
@@ -491,6 +553,22 @@ public class MainActivity extends AppCompatActivity implements TasksListFragment
             Toast.makeText(this,"Item deleted error",Toast.LENGTH_SHORT).show();
         }
         if (jj.getString("status").equals("token expired error")){
+
+            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+            String email = preferences.getString("email", "");
+            String password = preferences.getString("password", "");
+            if(!email.equalsIgnoreCase("")&&!password.equalsIgnoreCase("")) {
+
+                new MainActivity.CallServiceTask().execute("login", URL_login, email,password);
+
+
+            }else{
+
+                Toast.makeText(this,"Session expired. Login again",Toast.LENGTH_LONG).show();
+                finish();
+            }
+
+
             Toast.makeText(this,"Session expired. Login again",Toast.LENGTH_SHORT).show();
             finish();
         }
@@ -504,6 +582,13 @@ public class MainActivity extends AppCompatActivity implements TasksListFragment
         }
         if (jj.getString("status").equals("marked error")){
             Toast.makeText(this,"checked error",Toast.LENGTH_SHORT).show();
+        }
+        if(jj.getString("status").equals("succesfull log in"))
+        {
+            String Token_new = jj.getString("token");
+
+            Token = Token_new;
+
         }
 
 

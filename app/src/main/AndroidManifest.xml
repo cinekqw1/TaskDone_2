@@ -25,10 +25,8 @@
         <activity android:name=".MainActivity"
             android:screenOrientation="portrait"/>
         <activity android:name=".DetailActivity"
-                  android:theme="@style/AppTheme.Dark"
                   android:screenOrientation="portrait"/>
         <activity android:name=".AddItem"
-            android:theme="@style/AppTheme.Dark"
             android:screenOrientation="portrait"/>/>
     </application>
 

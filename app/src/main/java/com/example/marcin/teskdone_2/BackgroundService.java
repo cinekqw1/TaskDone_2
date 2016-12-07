@@ -54,6 +54,7 @@ public class BackgroundService extends AsyncTask<String, Void, String> {
             if(urls[0].equals("complete")){
                 return push_json_delete_item(urls[1],urls[2],urls[3]);
             }
+
         } catch (IOException e) {
             return "{\"status\":\"no connection to server\"}";
         } catch (JSONException e) {
@@ -62,7 +63,6 @@ public class BackgroundService extends AsyncTask<String, Void, String> {
         return "{\"status\":\"no connection to server\"}";
 
     }
-
 
 
     private String  push_json_delete_item(String myurl,String token,String id) throws IOException, JSONException {
@@ -153,7 +153,18 @@ public class BackgroundService extends AsyncTask<String, Void, String> {
     }
 
 
+    private JSONObject Json_build(String Email, String Password) throws JSONException {
 
+        JSONObject jo = new JSONObject();
+        JSONObject jo_final = new JSONObject();
+        jo.put("email", Email);
+        jo.put("password", Password);
+
+        jo_final.put("log_in", jo);
+
+
+        return jo_final;
+    }
 
 
 }

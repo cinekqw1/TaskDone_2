@@ -44,6 +44,14 @@
                 android:hint="Password"/>
         </android.support.design.widget.TextInputLayout>
 
+
+        <RadioButton
+            android:text="Keep login/password data?"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/radioButton"
+            android:onClick="onRadioButtonClicked"/>
+
         <android.support.v7.widget.AppCompatButton
             android:id="@+id/btn_login"
             android:layout_width="fill_parent"

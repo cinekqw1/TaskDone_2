@@ -3,15 +3,18 @@ package com.example.marcin.teskdone_2;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
 import org.json.JSONException;
@@ -42,7 +45,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener
     private  JSONObject Json_response;
     private String URL = "https://shopping-rails-app.herokuapp.com/api";
 
-
+    Boolean radio_button_check = false;
 
 
     @Override
@@ -60,13 +63,16 @@ public class Login extends AppCompatActivity implements View.OnClickListener
 
         }
 
-        sign_up.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://shopping-rails-app.herokuapp.com/users/sign_up"));
-                startActivity(browserIntent);
-            }
-        });
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        String email = preferences.getString("email", "");
+        String pass = preferences.getString("password", "");
+
+        if(!email.equalsIgnoreCase(""))  ET_Email.setText(email);
+
+        if(!pass.equalsIgnoreCase("")) ET_password.setText(pass);
+
+
+
     }
 
 
@@ -88,11 +94,35 @@ public class Login extends AppCompatActivity implements View.OnClickListener
         B_signin = (Button) findViewById(R.id.btn_login);
         sign_up = (TextView) findViewById(R.id.link_signup);
         B_signin.setOnClickListener(this);
-        //B_signup.setOnClickListener(this);
 
+        sign_up.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://shopping-rails-app.herokuapp.com/users/sign_up"));
+                startActivity(browserIntent);
+            }
+        });
     }
 
 
+    public void onRadioButtonClicked(View view) {
+        // Is the button now checked?
+        boolean checked = ((RadioButton) view).isChecked();
+
+        // Check which radio button was clicked
+        switch(view.getId()) {
+            case R.id.radioButton:{
+                if (checked) {
+                    radio_button_check = true;
+                    
+                }
+
+
+            }break;
+
+
+        }
+    }
 
 
     @Override
@@ -112,7 +142,37 @@ public class Login extends AppCompatActivity implements View.OnClickListener
 
                     String Email = ET_Email.getText().toString();
                     String Password = ET_password.getText().toString();
+
+                    if(radio_button_check){
+                        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+                        SharedPreferences.Editor editor = preferences.edit();
+                        editor.putString("email",Email);
+                        editor.putString("password",Password);
+                        editor.apply();
+
+                    }else{
+                        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+                        String email = preferences.getString("email", "");
+                        String password = preferences.getString("password", "");
+                        if(!email.equalsIgnoreCase(""))
+                        {
+                            SharedPreferences.Editor editor = preferences.edit();
+                            editor.remove("email");
+                            editor.apply();
+                            ET_Email.setText("");
+                        }
+                        if(!password.equalsIgnoreCase(""))
+                        {
+                            SharedPreferences.Editor editor = preferences.edit();
+                            editor.remove("password");
+                            editor.apply();
+                            ET_password.setText("");
+                        }
+                    }
+
+
                     new CallServiceTask().execute(URL, Email, Password);
+
                 }
                 else
                 {
@@ -149,6 +209,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener
 
 
     }
+
 
 
     public class CallServiceTask extends AsyncTask<String, Void, String> {
